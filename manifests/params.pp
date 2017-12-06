@@ -20,14 +20,20 @@ class tftp::params {
           $provider   = undef
         }
         'ubuntu': {
-          # ubuntu now uses systemd
-          if versioncmp($::operatingsystemrelease, '15.04') >= 0 {
-            $provider = 'systemd'
+          if $::virtual == 'docker' {
+            $provider = undef
+            $hasstatus  = false
           } else {
-            $provider   = 'upstart'
+            # ubuntu now uses systemd
+            if versioncmp($::operatingsystemrelease, '15.04') >= 0 {
+              $provider = 'systemd'
+            } else {
+              $provider = 'upstart'
+            }
+            $hasstatus  = true
           }
           $directory  = '/var/lib/tftpboot'
-          $hasstatus  = true
+
         }
         default: {
           fail "${::operatingsystem} is not supported"
